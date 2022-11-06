@@ -1,5 +1,5 @@
 import { it, expect } from "vitest";
-import { findCommonChar } from "../../src/string";
+import { findCommonChar } from "@string";
 
 const count = findCommonChar("aabbca");
 

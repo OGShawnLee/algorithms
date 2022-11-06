@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "baseUrl": "src",
+    "paths": {
+      "@string": ["string"],
+      "@string/*": ["string/*"]
+    },
+    "moduleResolution": "node"
+  }
+}
