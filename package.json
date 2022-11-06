@@ -12,6 +12,7 @@
   },
   "license": "ISC",
   "dependencies": {
-    "vite-node": "^0.24.5"
+    "vite-node": "^0.24.5",
+    "vitest": "^0.24.5"
   }
 }
