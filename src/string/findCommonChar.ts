@@ -14,7 +14,7 @@ export default function findCommonChar(str: string): CharCount {
 
   for (let index = 0; index < str.length; index++) {
     const char = str[index];
-    if (char in firstCharCount) continue;
+    if (char in cache) continue;
     const count = (cache[char] = getCharCount(char, str));
     if (count.count > cache.max.count) cache.max = count;
   }
