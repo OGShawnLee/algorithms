@@ -10,5 +10,8 @@
     "name": "Edgar Vázquez García",
     "url": "https://github.com/OGShawnLee"
   },
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "vite-node": "^0.24.5"
+  }
 }
