@@ -2,6 +2,8 @@
   "compilerOptions": {
     "baseUrl": "src",
     "paths": {
+      "@list": ["list"],
+      "@list/*": ["list/*"],
       "@string": ["string"],
       "@string/*": ["string/*"]
     },
