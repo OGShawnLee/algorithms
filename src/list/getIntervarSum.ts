@@ -1,6 +1,6 @@
 type Interval = [number, number];
 
-export default function getIntervalSum(intervals: Array<Interval>): number {
+export default function getIntervalSumRecursive(intervals: Array<Interval>): number {
   let sum = 0;
 
   for (let index = 0; index < intervals.length; index++) {
@@ -15,7 +15,7 @@ export default function getIntervalSum(intervals: Array<Interval>): number {
         // dirty but faster
         intervals[index] = [minimum, maximum];
         intervals.splice(idx, 1);
-        return getIntervalSum(intervals);
+        return getIntervalSumRecursive(intervals);
       }
     }
 

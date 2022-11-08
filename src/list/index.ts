@@ -1,1 +1,1 @@
-export { default as getIntervalSum } from "./getIntervarSum";
+export { default as getIntervalSumRecursive } from "./getIntervarSum";

@@ -1,7 +1,7 @@
 import { expect, it } from "vitest";
-import { getIntervalSum } from "@list";
+import { getIntervalSumRecursive } from "@list";
 
-const interval = getIntervalSum([
+const interval = getIntervalSumRecursive([
   [1, 2],
   [6, 10],
   [11, 15],
@@ -14,14 +14,14 @@ it("Should return a number", () => {
 it("Should return the sum of the given intervals", () => {
   expect(interval).toBe(9);
   expect(
-    getIntervalSum([
+    getIntervalSumRecursive([
       [1, 4],
       [7, 10],
       [3, 5],
     ])
   ).toBe(7);
   expect(
-    getIntervalSum([
+    getIntervalSumRecursive([
       [1, 5],
       [10, 20],
       [1, 6],
@@ -30,7 +30,7 @@ it("Should return the sum of the given intervals", () => {
     ])
   ).toBe(19);
   expect(
-    getIntervalSum([
+    getIntervalSumRecursive([
       [0, 20],
       [-100000000, 10],
       [30, 40],
