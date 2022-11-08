@@ -9,7 +9,7 @@ export default function getIntervalSum(intervals: Array<Interval>): number {
     for (let idx = 0; idx < intervals.length; idx++) {
       if (index === idx) continue;
       const [min, max] = intervals[idx];
-      if (isOverlapped(minimum, { min, max }) || isOverlapped(maximum, { min, max })) {
+      if (isOverlapped(intervals[idx], intervals[index])) {
         if (min < minimum) minimum = min;
         if (max > maximum) maximum = max;
         // dirty but faster
@@ -25,7 +25,6 @@ export default function getIntervalSum(intervals: Array<Interval>): number {
   return sum;
 }
 
-export function isOverlapped(num: number, range: { min?: number; max?: number } = {}) {
-  const { min = 0, max = Infinity } = range;
-  return num >= min && num < max;
+function isOverlapped([minimum, maximum]: Interval, [min, max]: Interval) {
+  return Math.max(maximum, max) - Math.min(minimum, min) < maximum - minimum + (max - min);
 }
