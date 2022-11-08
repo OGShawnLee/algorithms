@@ -1,6 +1,30 @@
-type Interval = [number, number];
+export type Interval = [number, number];
 
-export default function getIntervalSumRecursive(intervals: Array<Interval>): number {
+export function getIntervarSum(intervals: Interval[]) {
+  let isDirty = false;
+  do {
+    initial: for (let index = 0; index < intervals.length; index++) {
+      let [minimum, maximum] = intervals[index];
+      isDirty = false;
+      for (let i = 0; i < intervals.length; i++) {
+        const [min, max] = intervals[i];
+        if (intervals[index] === intervals[i]) continue;
+        if (isOverlapped(intervals[index], intervals[i])) {
+          isDirty = true;
+          if (min < minimum) minimum = min;
+          if (max > maximum) maximum = max;
+          intervals[index][0] = minimum;
+          intervals[index][1] = maximum;
+          intervals.splice(i, 1);
+          break initial;
+        }
+      }
+    }
+  } while (isDirty);
+  return intervals.reduce((total, [min, max]) => total + max - min, 0);
+}
+
+export function getIntervalSumRecursive(intervals: Array<Interval>): number {
   let sum = 0;
 
   for (let index = 0; index < intervals.length; index++) {
