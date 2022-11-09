@@ -1,5 +1,4 @@
 import type { Interval } from "@list";
-import { expect, it } from "vitest";
 import { getIntervalSumRecursive, getIntervarSum } from "@list";
 
 const functions = [getIntervalSumRecursive, getIntervarSum];

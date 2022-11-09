@@ -1,4 +1,3 @@
-import { expect, it } from "vitest";
 import { getVowelCount } from "@string";
 
 it("Should return a number", () => {

@@ -10,4 +10,7 @@ export default defineConfig({
       "@string/*": resolve("src/string/*"),
     },
   },
+  test: {
+    globals: true,
+  },
 });
