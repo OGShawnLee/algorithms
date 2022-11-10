@@ -1,7 +1,7 @@
 import type { Interval } from "@list";
-import { getIntervalSumRecursive, getIntervarSum } from "@list";
+import { getIntervalSum, getIntervalSumRecursive } from "@list";
 
-const functions = [getIntervalSumRecursive, getIntervarSum];
+const functions = [getIntervalSum, getIntervalSumRecursive];
 
 it("Should return a number", () => {
   const intervals: Interval[] = [

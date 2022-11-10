@@ -1,6 +1,6 @@
 export type Interval = [number, number];
 
-export function getIntervarSum(intervals: Interval[]) {
+export default function getIntervalSum(intervals: Interval[]) {
   let isDirty = false;
   do {
     initial: for (let index = 0; index < intervals.length; index++) {
