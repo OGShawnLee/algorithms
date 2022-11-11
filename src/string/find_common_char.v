@@ -13,7 +13,7 @@ pub fn find_common_char(str string) CharCount {
 		if code in cache { continue }
 		char_count := get_char_count(code, str)
 		cache[code] = char_count
-		if char_count.count > common.count{
+		if char_count.count > common.count {
 			common = char_count
 		} 
 	} 
