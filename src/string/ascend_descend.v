@@ -2,15 +2,10 @@ module string
 
 pub fn ascend_descend(len int, min int, max int) string {
 	if len <= 0 || min > max { return "" }
-	mut str := ""
+	if min == max { return min.str().repeat(len).substr(0, len)  }
 	mut num := min
 	mut num_str := num.str()
-	if min == max {
-		for index := 0; str.len < len; index++ { 
-			str += num_str 
-		}
-		return str
-	}
+	mut str := ""
 	mut is_going_up := num < max
 	for index := 0; str.len < len; index++ {
 		if is_going_up {
