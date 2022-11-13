@@ -16,3 +16,16 @@ pub fn find_max_sequence_sum(input []int) int {
 	}
 	return count
 }
+
+// found on the internet
+fn fast_find_max_sequence_sum(input []int) int {
+    mut min := 0 
+    mut ans := 0 
+    mut sum := 0
+    for index := 0; index < input.len; index++ {
+        sum += input[index]
+        min = math.min(sum, min)
+        ans = math.max(ans, sum - min)
+    }
+    return ans
+}

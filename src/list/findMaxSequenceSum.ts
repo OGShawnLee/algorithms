@@ -10,3 +10,15 @@ export default function findMaxSequenceSum(input: number[]) {
   }
   return count;
 }
+
+export function fastfindMaxSequenceSum(input: number[]) {
+  let min = 0;
+  let ans = 0;
+  let sum = 0;
+  for (let index = 0; index < input.length; index++) {
+    sum += input[index];
+    min = Math.min(sum, min);
+    ans = Math.max(ans, sum - min);
+  }
+  return ans;
+}
