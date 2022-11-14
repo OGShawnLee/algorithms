@@ -1,5 +1,5 @@
-export { default as ascendDescend } from "./ascendDescend";
-export { default as findCommonChar, CharCount } from "./findCommonChar";
-export { default as getDuplicateCount } from "./getDuplicateCount";
-export { default as getVowelCount } from "./getVowelCount";
-export { default as toNATO } from "./toNATO";
+export { default as ascendDescend } from "./ascend_descend";
+export { default as findCommonChar, CharCount } from "./find_common_char";
+export { default as getDuplicateCount } from "./get_duplicate_count";
+export { default as getVowelCount } from "./get_vowel_count";
+export { default as toNATO } from "./to_nato";
