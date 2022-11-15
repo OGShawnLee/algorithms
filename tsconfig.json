@@ -3,6 +3,7 @@
     "target": "ESNext",
     "types": ["vitest/globals"],
     "baseUrl": "src",
+    "module": "ESNext",
     "paths": {
       "@data": ["data"],
       "@list": ["list"],
