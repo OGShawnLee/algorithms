@@ -14,9 +14,7 @@ fn get_submarine_position(file_path string) int {
 	mut forward := 0
 	mut depth := 0
 	for line in lines {
-		parsed_line := line.split(" ")
-		direction := parsed_line[0]
-		value := parsed_line[1].int()
+		direction, value := parse_line(line)
 		match direction {
 			"forward" { forward += value }
 			"up" { depth -= value }
@@ -35,9 +33,7 @@ fn get_submarine_position_compound(file_path string) int {
 	mut depth := 0
 	mut forward := 0
 	for line in lines {
-		parsed_line := line.split(" ")
-		direction := parsed_line[0]
-		value := parsed_line[1].int()
+		direction, value := parse_line(line)
 		match direction {
 			"forward" {
 				forward += value
@@ -56,5 +52,12 @@ fn get_submarine_position_compound(file_path string) int {
 fn get_file_lines(file_path string) []string {
 	lines := os.read_lines(file_path) or { panic("unable to read file lines") }
 	return lines
+}
+
+fn parse_line(line string) (string, int) {
+	parsed_line := line.split(" ")
+	direction := parsed_line[0]
+	value := parsed_line[1].int()
+	return direction, value
 }
 
