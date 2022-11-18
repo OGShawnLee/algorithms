@@ -104,10 +104,12 @@ fn parse_str(str string) ![]Tile {
 }
 
 fn main() {
-	mut score, mut w_number, mut w_line := get_winner_board_score(example_path)!
+	example_result := spawn get_winner_board_score(example_path)
+	input_result := spawn get_winner_board_score(input_file_path)
+	mut score, mut w_number, mut w_line := example_result.wait()!
 	println("Results from Example File:")
   println("Winner Board Score: $score | Winner Number: $w_number | Won in: $w_line")
-	score, w_number, w_line = get_winner_board_score(input_file_path)!
+	score, w_number, w_line = input_result.wait()!
 	println("Results from Input File:")
   println("Winner Board Score: $score | Winner Number: $w_number | Won in: $w_line")
 }
