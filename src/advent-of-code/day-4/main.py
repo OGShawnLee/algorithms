@@ -65,14 +65,14 @@ def get_winner_board(file_path: str):
   raise ValueError("Unable to Find Winner Board")
 
 def get_winner_board_score(file_path: str):
-  w_board, w_number, is_column = get_winner_board(file_path)
+  w_board, w_number, w_line = get_winner_board(file_path)
   uncrossed_count = 0
   for row in w_board:
     for tile in row:
       if not tile.is_crossed:
         uncrossed_count += tile.value
   score = uncrossed_count * w_number
-  return score, w_number, is_column
+  return score, w_number, w_line
 
 if __name__ == "__main__":
   score, w_number, w_line = get_winner_board_score(EXAMPLE_FILE_PATH)
