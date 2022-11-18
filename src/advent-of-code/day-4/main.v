@@ -65,16 +65,15 @@ fn get_winner_board(file_path string) !([][]Tile, int, string) {
 				for tile_index, mut tile in row { 
 					if tile.value == number {
 						is_already_crossed := tile.is_crossed
-						if !is_already_crossed {
-							tile.cross()
-							column_counters[tile_index]++
-							row_counters[row_index]++
-							if column_counters[tile_index] == 5 {
-								return board, tile.value, "Column"
-							}
-							if row_counters[row_index] == 5 {
-								return board, tile.value, "Row"
-							}
+						if is_already_crossed { continue }
+						tile.cross()
+						column_counters[tile_index]++
+						row_counters[row_index]++
+						if column_counters[tile_index] == 5 {
+							return board, tile.value, "Column"
+						}
+						if row_counters[row_index] == 5 {
+							return board, tile.value, "Row"
 						}
 					}
 				}

@@ -52,16 +52,16 @@ def get_winner_board(file_path: str):
         for i, tile in enumerate(row): # column
           if tile.value == number:
             is_already_crossed = tile.is_crossed
-            if not is_already_crossed:
-              tile.cross()
-              board_columns[i] += 1
-              board_rows[idx] += 1
-              if board_columns[i] == 5:
-                return board, tile.value, "Column"
-              if board_columns[i] == 5 and board_rows[idx] == 5:
-                return board, tile.value, "Cross!"
-              if board_rows[idx] == 5:
-                return board, tile.value, "Row"
+            if is_already_crossed: continue
+            tile.cross()
+            board_columns[i] += 1
+            board_rows[idx] += 1
+            if board_columns[i] == 5:
+              return board, tile.value, "Column"
+            if board_columns[i] == 5 and board_rows[idx] == 5:
+              return board, tile.value, "Cross!"
+            if board_rows[idx] == 5:
+              return board, tile.value, "Row"
   raise ValueError("Unable to Find Winner Board")
 
 def get_winner_board_score(file_path: str):
