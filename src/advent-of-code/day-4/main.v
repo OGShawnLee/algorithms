@@ -7,8 +7,36 @@ struct Tile {
 		is_crossed bool
 }
 
+struct TileContext {
+	row_index int
+	tile_index int
+	mut:
+		column_counters []int
+		row_counters []int
+}
+
 fn (mut tile Tile) cross() {
 	tile.is_crossed = true
+}
+
+fn (mut tile Tile) handle_tile(mut context TileContext) (bool, string) {
+	tile.cross()
+	row_index := context.row_index
+	tile_index := context.tile_index
+	context.column_counters[tile_index]++
+	context.row_counters[row_index]++
+	column_count := context.column_counters[tile_index]
+	row_count := context.row_counters[row_index]
+	if column_count == 5 && row_count == 5 {
+		return true, "Cross!"
+	}
+	if column_count == 5 {
+		return true, "Column"
+	}
+	if row_count == 5 {
+		return true, "Row"
+	}
+	return false, "None"
 }
 
 const (
@@ -52,7 +80,52 @@ fn get_rounds_and_board(lines []string) !([]int, [][][]Tile) {
 	return rounds, boards
 }
 
-fn get_winner_board(file_path string) !([][]Tile, int, string) {
+struct CompletedBoard {
+	value int
+	w_line string
+}
+
+fn get_last_winner_board(file_path string) !([][]Tile, int, string) {
+	lines := get_file_lines(file_path)!
+	rounds, mut boards := get_rounds_and_board(lines)!
+	columns := create_board_counters(boards.len)
+	rows := create_board_counters(boards.len)
+	mut completed_boards := map[int]CompletedBoard {}
+	mut last_board_index := 0
+	for number in rounds {
+		for index, mut board in boards {
+			is_completed_board := index in completed_boards
+			if is_completed_board { continue }
+			mut column_counters := columns[index]
+			mut row_counters := rows[index]
+			row_loop: for row_index, mut row in board {
+				for tile_index, mut tile in row {
+					is_already_crossed := tile.is_crossed
+					if is_already_crossed || number != tile.value { continue }
+					has_won, line_w := tile.handle_tile(mut TileContext {
+						row_index: row_index
+						tile_index: tile_index,
+						column_counters: column_counters,
+						row_counters: row_counters
+					})
+					if has_won {
+						last_board_index = index
+						completed_boards[index] = CompletedBoard { tile.value, line_w }	
+						break row_loop
+					} 
+				}
+			}
+		}
+	}
+	if last_board_index in completed_boards {
+		completed_board := boards[last_board_index]
+		completed_board_info := completed_boards[last_board_index]
+		return completed_board, completed_board_info.value, completed_board_info.w_line
+	}
+	panic("Unable to Find Last Winner Board")
+}
+
+fn get_first_winner_board(file_path string) !([][]Tile, int, string) {
 	lines := get_file_lines(file_path)!
 	rounds, mut boards := get_rounds_and_board(lines)!
 	columns := create_board_counters(boards.len)
@@ -66,14 +139,14 @@ fn get_winner_board(file_path string) !([][]Tile, int, string) {
 					if tile.value == number {
 						is_already_crossed := tile.is_crossed
 						if is_already_crossed { continue }
-						tile.cross()
-						column_counters[tile_index]++
-						row_counters[row_index]++
-						if column_counters[tile_index] == 5 {
-							return board, tile.value, "Column"
-						}
-						if row_counters[row_index] == 5 {
-							return board, tile.value, "Row"
+						has_won, w_line := tile.handle_tile(mut TileContext {
+							row_index: row_index
+							tile_index: tile_index,
+							column_counters: column_counters,
+							row_counters: row_counters
+						})
+						if has_won {
+							return board, tile.value, w_line 
 						}
 					}
 				}
@@ -83,8 +156,11 @@ fn get_winner_board(file_path string) !([][]Tile, int, string) {
 	panic("Unable to Find Winner Board")
 }
 
-fn get_winner_board_score(file_path string) !(int, int, string) {
-	w_board, w_number, w_line := get_winner_board(file_path)!
+fn get_winner_board_score(
+	file_path string, 
+	func fn (file_path string) !([][]Tile, int, string)
+) !(int, int, string) {
+	w_board, w_number, w_line := func(file_path)!
 	mut count := 0
 	for row in w_board {
 		for tile in row {
@@ -104,12 +180,22 @@ fn parse_str(str string) ![]Tile {
 }
 
 fn main() {
-	example_result := spawn get_winner_board_score(example_path)
-	input_result := spawn get_winner_board_score(input_file_path)
+	example_result := spawn get_winner_board_score(example_path, get_first_winner_board)
+	input_result := spawn get_winner_board_score(input_file_path, get_first_winner_board)
+	last_example_result := spawn get_winner_board_score(example_path, get_last_winner_board)
+	last_input_result := spawn get_winner_board_score(input_file_path, get_last_winner_board)
 	mut score, mut w_number, mut w_line := example_result.wait()!
-	println("Results from Example File:")
-  println("Winner Board Score: $score | Winner Number: $w_number | Won in: $w_line")
+  println("First Board Winner:")
+  println(" -- Results from Example File:")
+  println(" ---- Winner Board Score: $score | Winner Number: $w_number | Won in: $w_line")
 	score, w_number, w_line = input_result.wait()!
-	println("Results from Input File:")
-  println("Winner Board Score: $score | Winner Number: $w_number | Won in: $w_line")
+	println(" -- Results from Input File:")
+  println(" ---- Winner Board Score: $score | Winner Number: $w_number | Won in: $w_line")
+	score, w_number, w_line = last_example_result.wait()!
+  println("Last Board Winner:")
+  println(" -- Results from Example File:")
+  println(" ---- Last Winner Board Score: $score | Winner Number: $w_number | Won in: $w_line")
+  score, w_number, w_line = last_input_result.wait()!
+  println(" -- Results from Input File:")
+  println(" ---- Last Winner Board Score: $score | Winner Number: $w_number | Won in: $w_line")
 }
