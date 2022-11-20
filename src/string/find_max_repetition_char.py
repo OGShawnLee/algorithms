@@ -1,15 +1,12 @@
 def find_max_repetition_char(string: str):
-  if len(string) == 0: return "", 0
-  maximum = dict(char = string[0], count = 1)
-  current = dict(char = string[0], count = 1)
-  for index in range(1, len(string)):
-    char = string[index]
-    if char == current['char']:
-      current["count"] += 1
+  max_char = ""; max_count = 0
+  char = max_char; count = max_count
+  for letter in string:
+    if letter == char:
+      count += 1
     else:
-      current['char'] = char
-      current['count'] = 1
-    if current['count'] > maximum["count"]:
-      maximum['char'] = current["char"]
-      maximum['count'] = current['count']
-  return maximum['char'], maximum['count']
+      char = letter
+      count = 1
+    if count > max_count:
+      max_char = char; max_count = count
+  return max_char, max_count

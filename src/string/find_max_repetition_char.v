@@ -1,26 +1,19 @@
-struct Cache {
-	mut:
-		letter u8
-		count int
-}
-
 fn find_max_repetition_char(str string) (string, int) {
-	if str.len == 0 { return "", 0 }
-	mut max := Cache{ str[0], 1 }
-	mut current := Cache{ str[0], 1 }
-	for index in 1..str.len {
-		letter := str[index]
-		if letter == current.letter {
-			current.count++
+	mut max_code := "".u8()
+	mut max_count := 0
+	mut code := max_code
+	mut count := max_count 
+	for c in str {
+		if c == code {
+			count++
 		} else {
-			current.letter = letter
-			current.count = 1
+			code = c
+			count = 1
 		}
-		if current.count > max.count {
-			max.letter = current.letter
-			max.count = current.count
+		if count > max_count {
+			max_code = code
+			max_count = count
 		}
 	}
-	return max.letter.ascii_str(), max.count
+	return max_code.ascii_str(), max_count
 }
-
