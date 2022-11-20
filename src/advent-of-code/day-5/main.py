@@ -50,8 +50,7 @@ def is_horizontal_line(start: tuple[int, int], end: tuple[int, int]):
   return start[1] == end[1]
 
 def is_vertical_line(start: tuple[int, int], end: tuple[int, int]):
-  run = end[0] - start[0]
-  return run == 0
+  return start[0] == end[0]
 
 def print_matrix(matrix: list[list[int]]):
   if len(matrix) < 20:
