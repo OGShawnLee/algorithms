@@ -9,6 +9,7 @@ export default defineConfig({
       "@list/*": resolve("src/list/*"),
       "@string": resolve("src/string"),
       "@string/*": resolve("src/string/*"),
+      "@utils": resolve("src/utils"),
     },
   },
   test: {

@@ -9,7 +9,8 @@
       "@list": ["list"],
       "@list/*": ["list/*"],
       "@string": ["string"],
-      "@string/*": ["string/*"]
+      "@string/*": ["string/*"],
+      "@utils": ["utils"]
     },
     "moduleResolution": "node"
   }
