@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "types": ["vitest/globals"],
+    "types": ["vitest/globals", "vitest/importMeta"],
     "baseUrl": "src",
     "module": "ESNext",
     "paths": {
