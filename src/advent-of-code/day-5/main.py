@@ -16,7 +16,7 @@ def get_diagonal_coordinates(start: tuple[int, int], end: tuple[int, int]):
     [0, 0] for i in range(coordinates_len)
   ]
   for coordinate in coordinates:
-    # i have to do this checks on every iteration cos python :/
+    # i have to do these checks on every iteration cos python :/
     if is_x_ascending:
       coordinate[0] = minimum_x
       minimum_x += 1
