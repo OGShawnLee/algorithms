@@ -31,10 +31,8 @@ fn create_matrix(size int) [][]int {
 }
 
 fn get_diagonal_coordinates(start []int, end []int) [][]int {
-	mut x_maximum := max(start[0], end[0]) 
-	mut x_minimum := min(start[0], end[0]) 
-	mut y_maximum := max(start[1], end[1])
-	mut y_minimum := min(start[1], end[1]) 
+	mut x_minimum, mut x_maximum := minmax(start[0], end[0]) 
+	mut y_minimum, mut y_maximum := minmax(start[1], end[1]) 
 	is_x_ascending := start[0] < end[0] 
 	is_y_ascending := start[1] < end[1]
 	coordinates_length := x_maximum + 1 - x_minimum
@@ -87,8 +85,7 @@ fn get_overlapped_count(mut matrix [][]int, coordinates [][][]int) int {
 		end := pair[1]
 		if is_horizontal_line(start, end) {
 			mut row := matrix[start[1]]
-			maximum := max(start[0], end[0])
-			minimum := min(start[0], end[0])
+			minimum, maximum := minmax(start[0], end[0])
 			for column_index in minimum..maximum + 1 {
 				row[column_index]++
 				tile := row[column_index]
@@ -96,8 +93,7 @@ fn get_overlapped_count(mut matrix [][]int, coordinates [][][]int) int {
 			}
 		} else if is_vertical_line(start, end) {
 			column_index := start[0]
-			maximum := max(start[1], end[1])
-			minimum := min(start[1], end[1])
+			minimum, maximum := minmax(start[1], end[1])
 			for row_index in minimum..maximum + 1 {
 				matrix[row_index][column_index]++
 				tile := matrix[row_index][column_index]
@@ -128,6 +124,10 @@ fn is_horizontal_line(start []int, end []int) bool {
 
 fn is_vertical_line(start []int, end []int) bool {
 	return start[0] == end[0]
+}
+
+fn minmax<T>(a T, b T) (T, T) {
+	return min(a, b), max(a, b)
 }
 
 fn print_matrix(matrix [][]int) {
