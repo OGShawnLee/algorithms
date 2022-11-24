@@ -13,7 +13,7 @@ fn main() {
 	mut count := get_overlapped_count(mut matrix, coordinates)
 	println("Example File Results")
 	print_matrix(matrix)
-	println(" --> Overlapped Count $count")
+	println("--> Overlapped Count $count")
 	lines = get_file_lines(input_file_path)!
 	matrix = create_matrix(1000)
 	coordinates = get_line_coordinates(lines)
