@@ -30,6 +30,48 @@ fn create_matrix(size int) [][]int {
 	}
 }
 
+fn get_diagonal_coordinates(start []int, end []int) [][]int {
+	mut x_maximum := max(start[0], end[0]) 
+	mut x_minimum := min(start[0], end[0]) 
+	mut y_maximum := max(start[1], end[1])
+	mut y_minimum := min(start[1], end[1]) 
+	is_x_ascending := start[0] < end[0] 
+	is_y_ascending := start[1] < end[1]
+	coordinates_length := x_maximum + 1 - x_minimum
+	mut coordinates := [][]int{ 
+		cap: coordinates_length, 
+		len: coordinates_length, 
+		init: []int { cap: 2, len: 2, init: 0 } 
+	}
+	handle_x := if is_x_ascending {
+		fn [mut x_minimum] (mut pair []int) {
+			pair[0] = x_minimum
+			x_minimum++
+		}
+	} else {
+		fn [mut x_maximum] (mut pair []int) {
+			pair[0] = x_maximum
+			x_maximum--
+		}
+	}
+	handle_y := if is_y_ascending {
+		fn [mut y_minimum] (mut pair []int) {
+			pair[1] = y_minimum
+			y_minimum++
+		}
+	} else {
+		fn [mut y_maximum] (mut pair []int) {
+			pair[1] = y_maximum
+			y_maximum--
+		}
+	}
+	for mut pair in coordinates {
+		handle_x(mut pair)
+		handle_y(mut pair)
+	}
+	return coordinates
+}
+
 fn get_line_coordinates(lines []string) [][][]int {
 	mut coordinates := [][][]int{}
 	for line in lines {
@@ -52,14 +94,22 @@ fn get_overlapped_count(mut matrix [][]int, coordinates [][][]int) int {
 				tile := row[column_index]
 				if tile == 2 { overlapped_count++ }
 			}
-		}
-		if is_vertical_line(start, end) {
+		} else if is_vertical_line(start, end) {
 			column_index := start[0]
 			maximum := max(start[1], end[1])
 			minimum := min(start[1], end[1])
 			for row_index in minimum..maximum + 1 {
 				matrix[row_index][column_index]++
 				tile := matrix[row_index][column_index]
+				if tile == 2 { overlapped_count++ }
+			} 
+		} else {
+			diagonal_coordinates := get_diagonal_coordinates(start, end)
+			for coordinate in diagonal_coordinates {
+				column_index := coordinate[0]
+				row_index := coordinate[1]
+				matrix[row_index][column_index]++
+				tile := matrix[row_index][column_index] 
 				if tile == 2 { overlapped_count++ }
 			}
 		}
