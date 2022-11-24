@@ -96,12 +96,12 @@ if __name__ == "__main__":
   # EXAMPLE FILE
   matrix = create_matrix(10)
   overlapped_count = get_overlapped_count(EXAMPLE_FILE_PATH, matrix)
-  print("---------- Results from Example File ----------")
+  print("Results from Example File")
   print_matrix(matrix)
   print(f"--> Overlapped Count: {overlapped_count}\n")
   # INPUT FILE
   matrix = create_matrix(1000)
   overlapped_count = get_overlapped_count(INPUT_FILE_PATH, matrix)
-  print("---------- Results from Input File ----------")
+  print("Results from Input File")
   print_matrix(matrix)
   print(f"--> Overlapped Count: {overlapped_count}\n")
