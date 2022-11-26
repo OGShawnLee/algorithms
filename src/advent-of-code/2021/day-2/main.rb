@@ -21,6 +21,27 @@ def get_submarine_position lines
   depth * forward
 end
 
+def get_submarine_position_compound lines
+  aim = 0
+  depth = 0
+  forward = 0
+  for line in lines
+    direction, value = parse_line line
+    case direction
+    when "forward"
+      forward += value
+      depth += aim * value
+    when "up"
+      aim -= value
+    when "down"
+      aim += value
+    else
+      raise "#{direction} is an invalid direction" 
+    end
+  end
+  depth * forward
+end
+
 def parse_line line
   direction, value = line.split(" ")
   return direction, value.to_i
@@ -31,3 +52,5 @@ INPUT_FILE_PATH = "./input.txt"
 lines = get_file_lines INPUT_FILE_PATH
 position = get_submarine_position lines
 puts "Submarine Position: #{position}"
+compound_position = get_submarine_position_compound lines
+puts "Submarine Compound Position: #{compound_position}"
