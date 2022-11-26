@@ -4,8 +4,8 @@ const input_file_path = "./input.txt"
 
 fn main() {
 	lines := get_file_lines(input_file_path)!
-	wrapping_paper := get_total_wrapping_paper(lines)
-	println("Total Wrapping Paper: $wrapping_paper square feet")
+	paper, ribbon := get_total_wrapping_paper_and_ribbon(lines)
+	println("Total Wrapping Paper: $paper square feet | Total Ribbon: $ribbon feet")
 }
 
 fn get_file_lines(file_path string) ![]string {
@@ -15,18 +15,26 @@ fn get_file_lines(file_path string) ![]string {
 	return lines
 }
 
-fn calculate_present_wrapping_paper(line string) int {
-	length, width, height := parse_present_dimensions(line)
+fn calculate_present_wrapping_paper(length int, width int, height int) int {
 	slack := length * width
 	return (2 * length * width) + (2 * width * height) + (2 * height * length) + slack 
 }
 
-fn get_total_wrapping_paper(lines []string) int {
+fn calculate_present_ribbon(length int, width int, height int) int {
+	ribbon := length * 2 + width * 2 
+	bow := length * width * height
+	return ribbon + bow
+}
+
+fn get_total_wrapping_paper_and_ribbon(lines []string) (int, int) {
 	mut wrapping_paper := 0
+	mut ribbon := 0
 	for line in lines {
-		wrapping_paper += calculate_present_wrapping_paper(line)
+		length, width, height := parse_present_dimensions(line)
+		wrapping_paper += calculate_present_wrapping_paper(length, width, height)
+		ribbon += calculate_present_ribbon(length, width, height)
 	}	
-	return wrapping_paper
+	return wrapping_paper, ribbon
 }
 
 fn parse_present_dimensions(line string) (int, int, int) {
