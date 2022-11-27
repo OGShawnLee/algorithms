@@ -13,11 +13,11 @@ class BitCounter
   end
   
   def get_common_bit_char
-    if @on > @off then "1" else "0" end
+    if @on >= @off then "1" else "0" end
   end
 
   def get_uncommon_bit_char
-    if @on > @off then "0" else "1" end
+    if @on >= @off then "0" else "1" end
   end
 end
 
@@ -42,6 +42,38 @@ def get_epsilon_gamma_rates lines, bit_length
   return epsilon_rate.to_i(2), gamma_rate.to_i(2)
 end
 
+def get_submarine_carbon_rate file_path, bit_length
+  lines = get_file_lines(file_path)
+  counters = Array.new(bit_length) { BitCounter.new }
+  counters.each.with_index do |counter, index|
+    break if lines.length == 1
+    for line in lines
+      counter.count(line[index])
+    end
+    lines = lines.select { |line| line[index] == counter.get_uncommon_bit_char }
+  end
+  lines[0].to_i(2)
+end
+
+def get_submarine_life_support_ratings file_path, bit_length
+  carbon = get_submarine_carbon_rate(file_path, bit_length)
+  oxygen = get_submarine_oxygen_rate(file_path, bit_length)
+  carbon * oxygen
+end
+
+def get_submarine_oxygen_rate file_path, bit_length
+  lines = get_file_lines(file_path)
+  counters = Array.new(bit_length) { BitCounter.new }
+  counters.each.with_index do |counter, index|
+    break if lines.length == 1
+    for line in lines
+      counter.count(line[index])
+    end
+    lines = lines.select { |line| line[index] == counter.get_common_bit_char }
+  end
+  lines[0].to_i(2)
+end 
+
 def get_submarine_power_consumption lines, bit_length
   epsilon_rate, gamma_rate = get_epsilon_gamma_rates(lines, bit_length)
   epsilon_rate * gamma_rate
@@ -56,8 +88,11 @@ lines = get_file_lines(EXAMPLE_FILE_PATH)
 power_consumption = get_submarine_power_consumption(lines, EXAMPLE_BIT_LENGTH)
 puts "Example File Results:"
 puts "Submarine Power Consumption: #{power_consumption}" 
+life_support = get_submarine_life_support_ratings(EXAMPLE_FILE_PATH, EXAMPLE_BIT_LENGTH)
+puts "Life Support Rating: #{life_support}"
 lines = get_file_lines(INPUT_FILE_PATH)
 power_consumption = get_submarine_power_consumption(lines, INPUT_BIT_LENGTH)
 puts "Input File Results:"
 puts "Submarine Power Consumption: #{power_consumption}" 
-
+life_support = get_submarine_life_support_ratings(INPUT_FILE_PATH, INPUT_BIT_LENGTH)
+puts "Life Support Rating: #{life_support}"
