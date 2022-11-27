@@ -43,16 +43,9 @@ def get_epsilon_gamma_rates lines, bit_length
 end
 
 def get_submarine_carbon_rate file_path, bit_length
-  lines = get_file_lines(file_path)
-  counters = Array.new(bit_length) { BitCounter.new }
-  counters.each.with_index do |counter, index|
-    break if lines.length == 1
-    for line in lines
-      counter.count(line[index])
-    end
-    lines = lines.select { |line| line[index] == counter.get_uncommon_bit_char }
+  use_line_filtering(file_path, bit_length) do |counter, bit_char|
+    bit_char == counter.get_uncommon_bit_char
   end
-  lines[0].to_i(2)
 end
 
 def get_submarine_life_support_ratings file_path, bit_length
@@ -62,6 +55,17 @@ def get_submarine_life_support_ratings file_path, bit_length
 end
 
 def get_submarine_oxygen_rate file_path, bit_length
+  use_line_filtering(file_path, bit_length) do |counter, bit_char|
+    bit_char == counter.get_common_bit_char
+  end
+end 
+
+def get_submarine_power_consumption lines, bit_length
+  epsilon_rate, gamma_rate = get_epsilon_gamma_rates(lines, bit_length)
+  epsilon_rate * gamma_rate
+end  
+
+def use_line_filtering file_path, bit_length 
   lines = get_file_lines(file_path)
   counters = Array.new(bit_length) { BitCounter.new }
   counters.each.with_index do |counter, index|
@@ -69,15 +73,10 @@ def get_submarine_oxygen_rate file_path, bit_length
     for line in lines
       counter.count(line[index])
     end
-    lines = lines.select { |line| line[index] == counter.get_common_bit_char }
+    lines = lines.select { |line| yield counter, line[index] }
   end
   lines[0].to_i(2)
-end 
-
-def get_submarine_power_consumption lines, bit_length
-  epsilon_rate, gamma_rate = get_epsilon_gamma_rates(lines, bit_length)
-  epsilon_rate * gamma_rate
-end  
+end
 
 EXAMPLE_FILE_PATH = "./example.txt"
 EXAMPLE_BIT_LENGTH = 5
