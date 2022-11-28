@@ -7,6 +7,15 @@ proc getDirectionCharValue(letter: char): int =
     return -1
   return 0
 
+proc getBasementDirectionPosition(lines: seq[string]): int =
+  var floorNumber = 0
+  for line in lines:
+    for index, letter in line:
+      floorNumber += getDirectionCharValue(letter)
+      if floorNumber == -1:
+        return index + 1
+  raise newException(ValueError, "Unable to Find Basement Direction Position")
+
 proc getFllorNumberFromDirections(lines: seq[string]): int =
   var floorNumber = 0
   for line in lines:
@@ -21,4 +30,5 @@ const input_file_name = "./input.txt"
 
 let directions = getFileLines(input_file_name)
 let floorNumber = getFllorNumberFromDirections(directions)
-echo(fmt"Floor Number: {floorNumber}")
+let position = getBasementDirectionPosition(directions)
+echo(fmt"Floor Number: {floorNumber} | Basement Direction Position: {position}")
