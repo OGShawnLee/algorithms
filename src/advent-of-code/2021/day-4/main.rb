@@ -123,20 +123,65 @@ def get_file_lines file_path
   IO.readlines(file_path)
 end
 
-def print_results file_name, score, win_number, win_line
+def get_last_board_winner lines
+  boards, rounds = get_boards_and_rounds(lines)
+  completed_boards = {}
+  last_board_index = 0
+  for round in rounds
+    boards.each.with_index do |board, index|
+      is_completed_board = completed_boards.has_key?(index)
+      next if is_completed_board
+      begin
+        board.rows.each.with_index do |row, row_index|          
+          row.tiles.each.with_index do |tile, tile_index|
+            is_already_crossed = tile.is_crossed
+            next if tile.value != round or is_already_crossed
+            has_won, win_text = board.cross(row_index, tile_index)
+            if has_won
+              last_board_index = index
+              completed_boards[index] = { 
+                board: board, 
+                value: tile.value, 
+                win_text: win_text 
+              }
+              raise "Finished Loop"
+            end
+          end
+        end
+      rescue
+        next
+      end
+    end
+  end
+  if not completed_boards.has_key?(last_board_index)
+    raise "Unable to Find Last Winner Board"
+  end
+  completed_board = completed_boards[last_board_index]
+  return completed_board[:board], completed_board[:value], completed_board[:win_text]
+end
+
+def print_results file_name, score, win_number, win_line, is_last = false
+  message = is_last ? "Last Winner Board" : "Winner Board"
   puts " -- Results from #{file_name}:"
-  puts " ---- Winner Board Score #{score} | Winner Number #{win_number} | Won in: #{win_line}"
+  puts " ---- #{message} Score: #{score} | Winner Number: #{win_number} | Won in: #{win_line}"
 end
 
 EXAMPLE_FILE_PATH ="./example.txt"
 INPUT_FILE_PATH = "./input.txt"
 
-lines = get_file_lines(EXAMPLE_FILE_PATH)
-board, win_number, win_line = get_first_board_winner(lines)
+example_lines = get_file_lines(EXAMPLE_FILE_PATH)
+board, win_number, win_line = get_first_board_winner(example_lines)
 score = board.get_board_score(win_number)
 puts "First Board Winner"
 print_results("Example File", score, win_number, win_line)
-lines = get_file_lines(INPUT_FILE_PATH)
-board, win_number, win_line = get_first_board_winner(lines)
+input_lines = get_file_lines(INPUT_FILE_PATH)
+board, win_number, win_line = get_first_board_winner(input_lines)
 score = board.get_board_score(win_number)
 print_results("Input File", score, win_number, win_line)
+puts "Last Board Winner"
+board, win_number, win_line = get_last_board_winner(example_lines)
+score = board.get_board_score(win_number)
+print_results("Example File", score, win_number, win_line, true)
+board, win_number, win_line = get_last_board_winner(input_lines)
+score = board.get_board_score(win_number)
+print_results("Input File", score, win_number, win_line, true)
