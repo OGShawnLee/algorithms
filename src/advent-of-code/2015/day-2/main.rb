@@ -24,9 +24,7 @@ def get_total_wrapping_paper lines
 end 
 
 def parse_present_dimensions line
-  numbers = line.split("x").map do |char|
-    char.to_i
-  end
+  numbers = line.split("x").map { |char| char.to_i } 
   numbers.sort { |a, b| a <=> b }
 end
 
