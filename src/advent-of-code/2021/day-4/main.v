@@ -1,201 +1,150 @@
+import arrays { fold, map_indexed }
 import os { read_lines }
-import regex { regex_opt }
 
-struct Tile {
+const example_path = "./example.txt"
+const input_path = "./input.txt"
+
+fn main() {
+	mut board, mut win_round, mut win_text := get_first_board_winner(example_path)!
+	mut score := board.get_score(win_round)
+	print_results("Example", score, win_round, win_text)
+	board, win_round, win_text = get_first_board_winner(input_path)!
+	score = board.get_score(win_round)
+	print_results("Input", score, win_round, win_text)
+	board, win_round, win_text = get_last_board_winner(example_path)!
+	score = board.get_score(win_round)
+	print_results("Example", score, win_round, win_text)
+	board, win_round, win_text = get_last_board_winner(input_path)!
+	score = board.get_score(win_round)
+	print_results("Input", score, win_round, win_text)
+}
+
+struct Board {
 	mut: 
-		value int
-		is_crossed bool
-}
-
-struct TileContext {
-	row_index int
-	tile_index int
-	mut:
+		rows []Row
 		column_counters []int
-		row_counters []int
 }
 
-fn (mut tile Tile) cross() {
-	tile.is_crossed = true
-}
-
-fn (mut tile Tile) handle_tile(mut context TileContext) (bool, string) {
-	tile.cross()
-	row_index := context.row_index
-	tile_index := context.tile_index
-	context.column_counters[tile_index]++
-	context.row_counters[row_index]++
-	column_count := context.column_counters[tile_index]
-	row_count := context.row_counters[row_index]
-	if column_count == 5 && row_count == 5 {
-		return true, "Cross!"
-	}
-	if column_count == 5 {
-		return true, "Column"
-	}
-	if row_count == 5 {
-		return true, "Row"
-	}
+fn (mut board Board) cross(round int, mut row Row, mut tile Tile) (bool, string) {
+	is_already_crossed := tile.is_crossed
+	if is_already_crossed || tile.value != round { return false, "None" }
+	row.count++
+	tile.is_crossed = true 
+	board.column_counters[tile.index]++
+	won_with_column := board.is_column_complete(tile.index)
+	won_with_row := row.is_complete()
+	if won_with_column && won_with_row { return true, "T-Shape!" }
+	if won_with_column { return true, "Column" }
+	if won_with_row { return true, "Row" }
 	return false, "None"
 }
 
-const (
-	input_file_path = "./input.txt"
-	example_path = "./example.txt"
-)
+fn (board Board) get_score(win_round int) int {
+	non_crossed_count := fold(board.rows, 0, fn (count int, row Row) int {
+		return fold(row.tiles, count, fn (count int, tile Tile) int {
+			return count + if tile.is_crossed { 0 } else { tile.value } 
+		})
+	})
+	return non_crossed_count * win_round
+}
 
-fn create_board_counters(length int) [][]int {
-	return [][]int { 
-		cap: length, 
-		len: length, 
-		init: []int { cap: 5, len: 5, init: 0  }  
+fn (board Board) is_column_complete(column_index int) bool {
+	return board.column_counters[column_index] == 5
+}
+
+struct Row {
+	tiles []Tile
+	mut: count int
+}
+
+fn (row Row) is_complete() bool {
+	return row.count == 5
+}
+
+struct Tile {
+	value int
+	index int
+	mut: is_crossed bool
+}
+
+fn get_boards_and_rounds(file_path string) !([]Board, []int) {
+	lines := get_file_lines(file_path)!
+	rounds := lines[0].split(",").map(it.int())
+	mut boards := []Board {}
+	for index in 1..lines.len {
+		line := lines[index]
+		if line == "" {
+			boards << Board { []Row {}, []int{ cap: 5, len: 5, init: 0 } }
+		} else {
+			mut board := boards.last()
+			board.rows << Row{ parse_line(line), 0 }
+			boards[boards.len - 1] = board
+		}
 	}
+	return boards, rounds 
 }
 
 fn get_file_lines(file_path string) ![]string {
-	lines := read_lines(file_path) or { panic("unable to read file lines") }
+	lines := read_lines(file_path) or {
+		panic("Unable to read lines from $file_path")
+	}
 	return lines
 }
 
-fn get_rounds_and_board(lines []string) !([]int, [][][]Tile) {
-	rounds := lines[0].split(",").map(it.int())
-	mut boards := [][][]Tile{}
-	mut is_collecting_board := false
-	for index in 1..lines.len {
-		line := lines[index]
-		if is_collecting_board {
-			row := parse_str(line)!
-			mut board := boards.last()
-			board << row // bug: v creates a new array here instead of mutating the original
-			boards[boards.len - 1] = board // have to replace here
-			if board.len == 5 {
-				is_collecting_board = false
-			}
-		}
-		if line == "" {
-			is_collecting_board = true
-			boards << [][]Tile{}
-		}
+fn get_first_board_winner(file_path string) !(Board, int, string) {
+	mut boards, rounds := get_boards_and_rounds(file_path) or {
+		panic("Unable to Get First Board Winner -> Unable to Read $file_path")
 	}
-	return rounds, boards
-}
-
-struct CompletedBoard {
-	value int
-	w_line string
-}
-
-fn get_last_winner_board(file_path string) !([][]Tile, int, string) {
-	lines := get_file_lines(file_path)!
-	rounds, mut boards := get_rounds_and_board(lines)!
-	columns := create_board_counters(boards.len)
-	rows := create_board_counters(boards.len)
-	mut completed_boards := map[int]CompletedBoard {}
-	mut last_board_index := 0
-	for number in rounds {
-		for index, mut board in boards {
-			is_completed_board := index in completed_boards
-			if is_completed_board { continue }
-			mut column_counters := columns[index]
-			mut row_counters := rows[index]
-			row_loop: for row_index, mut row in board {
-				for tile_index, mut tile in row {
-					is_already_crossed := tile.is_crossed
-					if is_already_crossed || number != tile.value { continue }
-					has_won, line_w := tile.handle_tile(mut TileContext {
-						row_index: row_index
-						tile_index: tile_index,
-						column_counters: column_counters,
-						row_counters: row_counters
-					})
-					if has_won {
-						last_board_index = index
-						completed_boards[index] = CompletedBoard { tile.value, line_w }	
-						break row_loop
-					} 
+	for round in rounds {
+		for mut board in boards {
+			for mut row in board.rows {
+				for mut tile in row.tiles {
+					has_won, win_text := board.cross(round, mut row, mut tile)
+					if has_won { return board, tile.value, win_text }
 				}
 			}
 		}
 	}
-	if last_board_index in completed_boards {
-		completed_board := boards[last_board_index]
-		completed_board_info := completed_boards[last_board_index]
-		return completed_board, completed_board_info.value, completed_board_info.w_line
-	}
-	panic("Unable to Find Last Winner Board")
+	panic("Unable to Get First Board Winner -> Missing Rounds for Completing a Board")
 }
 
-fn get_first_winner_board(file_path string) !([][]Tile, int, string) {
-	lines := get_file_lines(file_path)!
-	rounds, mut boards := get_rounds_and_board(lines)!
-	columns := create_board_counters(boards.len)
-	rows := create_board_counters(boards.len)
-	for number in rounds {
-		for index, mut board in boards {
-			mut column_counters := columns[index]
-			mut row_counters := rows[index]
-			for row_index, mut row in board {
-				for tile_index, mut tile in row { 
-					if tile.value == number {
-						is_already_crossed := tile.is_crossed
-						if is_already_crossed { continue }
-						has_won, w_line := tile.handle_tile(mut TileContext {
-							row_index: row_index
-							tile_index: tile_index,
-							column_counters: column_counters,
-							row_counters: row_counters
-						})
-						if has_won {
-							return board, tile.value, w_line 
-						}
+fn get_last_board_winner(file_path string) !(Board, int, string) {
+	mut boards, rounds := get_boards_and_rounds(file_path) or {
+		panic("Unable to Get First Board Winner -> Unable to Read $file_path")
+	}
+	mut completed_index := 0
+	mut completed_value := 0
+	mut completed_win_text := "None"
+	mut completed_boards := map[int]bool {}
+	for round in rounds {
+		for board_index, mut board in boards {
+			if board_index in completed_boards { continue }
+			row_loop: for mut row in board.rows {
+				for mut tile in row.tiles {
+					has_won, win_text := board.cross(round, mut row, mut tile)
+					if has_won { 
+						completed_index = board_index
+						completed_value = tile.value
+						completed_win_text = win_text
+						completed_boards[board_index] = true 
+						break row_loop
 					}
 				}
 			}
 		}
 	}
-	panic("Unable to Find Winner Board")
+	if completed_win_text == "None" { panic("Unable to Find Last Board Winner") }
+	return boards[completed_index], completed_value, completed_win_text
 }
 
-fn get_winner_board_score(
-	file_path string, 
-	func fn (file_path string) !([][]Tile, int, string)
-) !(int, int, string) {
-	w_board, w_number, w_line := func(file_path)!
-	mut count := 0
-	for row in w_board {
-		for tile in row {
-			if !tile.is_crossed {
-				count += tile.value
-			}
-		}
-	}
-	score := count * w_number
-	return score, w_number, w_line
+fn parse_line(line string) []Tile {
+	cleared := line.split(" ").filter(it != "")
+	return map_indexed(cleared, fn (index int, str string) Tile {
+		return Tile { value: str.int(), index: index, is_crossed: false }
+	})
 }
 
-fn parse_str(str string) ![]Tile {
-	mut re := regex_opt(r"\s") or { panic("Unable to parse string") }
-	cleared := re.replace(str, " ")
-	return cleared.split(" ").filter(it != "").map(Tile{ it.int(), false })
-}
-
-fn main() {
-	example_result := spawn get_winner_board_score(example_path, get_first_winner_board)
-	input_result := spawn get_winner_board_score(input_file_path, get_first_winner_board)
-	last_example_result := spawn get_winner_board_score(example_path, get_last_winner_board)
-	last_input_result := spawn get_winner_board_score(input_file_path, get_last_winner_board)
-	mut score, mut w_number, mut w_line := example_result.wait()!
-  println("First Board Winner:")
-  println(" -- Results from Example File:")
-  println(" ---- Winner Board Score: $score | Winner Number: $w_number | Won in: $w_line")
-	score, w_number, w_line = input_result.wait()!
-	println(" -- Results from Input File:")
-  println(" ---- Winner Board Score: $score | Winner Number: $w_number | Won in: $w_line")
-	score, w_number, w_line = last_example_result.wait()!
-  println("Last Board Winner:")
-  println(" -- Results from Example File:")
-  println(" ---- Last Winner Board Score: $score | Winner Number: $w_number | Won in: $w_line")
-  score, w_number, w_line = last_input_result.wait()!
-  println(" -- Results from Input File:")
-  println(" ---- Last Winner Board Score: $score | Winner Number: $w_number | Won in: $w_line")
+fn print_results(file_name string, score int, win_round int, win_text string) {
+	println(" -- Results from $file_name File")
+	println(" ---- Score: $score | Round: $win_round | Text: $win_text")
 }
