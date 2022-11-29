@@ -2,6 +2,43 @@ def create_matrix size
   Array.new(size) { Array.new(size, 0) }
 end
 
+def get_diagonal_coordinates root, head
+  min_x, max_x = minmax(root[0], head[0])
+  min_y, max_y = minmax(root[1], head[1])
+  is_x_ascending = root[0] < head[0]
+  is_y_ascending = root[1] < head[1]
+  coordinates_length = max_x + 1 - min_x
+  coordinates = Array.new(coordinates_length) { [0, 0] }
+  handle_x = 
+  if is_x_ascending
+    -> (coordinate) { 
+      coordinate[0] = min_x
+      min_x += 1 
+    }
+  else 
+    -> (coordinate) {
+      coordinate[0] = max_x
+      max_x -= 1 
+    }
+  end
+  handle_y = 
+  if is_y_ascending
+    -> (coordinate) {
+      coordinate[1] = min_y
+      min_y += 1
+    }
+  else
+    -> (coordinate) {
+      coordinate[1] = max_y
+      max_y -= 1
+    }
+  end
+  for coordinate in coordinates
+    handle_x.call(coordinate)
+    handle_y.call(coordinate)
+  end
+end
+
 def get_file_lines file_path
   IO.readlines(file_path, chomp: true)
 end
@@ -17,8 +54,7 @@ def get_overlapped_count file_path, matrix
         tile = row[column_index]
         count += 1 if tile == 2 
       end
-    end
-    if is_vertical_line(root, head)
+    elsif is_vertical_line(root, head)
       column_index = root[0]
       tail, peak = minmax(root[1], head[1])
       (tail..peak).each do |row_index|
@@ -26,6 +62,13 @@ def get_overlapped_count file_path, matrix
         tile = matrix[row_index][column_index]
         count += 1 if tile == 2
       end
+    else
+      coordinates = get_diagonal_coordinates(root, head)
+      for column_index, row_index in coordinates
+        matrix[row_index][column_index] += 1
+        tile = matrix[row_index][column_index]
+        count += 1 if tile == 2
+      end 
     end
     count
   end  
