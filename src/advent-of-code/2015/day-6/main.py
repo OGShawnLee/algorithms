@@ -1,5 +1,6 @@
 from pathlib import Path
 from re import findall, search
+from typing import Callable
 
 def create_matrix(size: int, value: int):
   return [
@@ -87,14 +88,25 @@ def parse_line(line: str):
   ]
   return instruction, start, end
 
-def use_instruction_light_count_change(start: list[int], end: list[int], matrix: list[list[int]], fn):
+def use_instruction_light_count_change(
+  start: list[int], 
+  end: list[int], 
+  matrix: list[list[int]], 
+  fn: Callable[[list[list[int]], int, int], int]
+):
   change = 0
   for row_index in range(start[0], end[0] + 1):
     for column_index in range(start[1], end[1] + 1):
       change += fn(matrix, row_index, column_index)
   return change
 
-def use_instruction_matching(line: str, matrix: list[list[int]], on_toggle, on_turn_on, on_turn_off):
+def use_instruction_matching(
+  line: str, 
+  matrix: list[list[int]], 
+  on_toggle: Callable[[list[list[int]], int, int], int], 
+  on_turn_on: Callable[[list[list[int]], int, int], int], 
+  on_turn_off: Callable[[list[list[int]], int, int], int]
+):
   instruction, start, end = parse_line(line)
   change = 0
   if instruction == "toggle":
