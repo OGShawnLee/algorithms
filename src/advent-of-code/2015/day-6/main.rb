@@ -1,8 +1,38 @@
-def create_matrix size
-  Array.new(size) { Array.new(size, -1) }
+def create_matrix size, matrix_value
+  Array.new(size) { Array.new(size, matrix_value) }
 end
 
-def get_instruction_light_count matrix, line
+def get_instruction_light_brightness line, matrix
+  change = 0
+  instruction, root, peak = parse_line(line)
+  case instruction
+  when "toggle"
+    change += use_instruction_light_change(root, peak) do |row_index, column_index|
+      matrix[row_index][column_index] += 2
+      2
+    end
+  when "turn on"
+    change += use_instruction_light_change(root, peak) do |row_index, column_index|
+      matrix[row_index][column_index] += 1
+      1
+    end
+  when "turn off"
+    change += use_instruction_light_change(root, peak) do |row_index, column_index|
+      brightness = matrix[row_index][column_index]
+      if brightness == 0
+        0
+      else
+        matrix[row_index][column_index] -= 1
+        -1
+      end
+    end
+  else
+    raise "#{instruction} is an Invalid Instruction!"
+  end
+  change
+end
+
+def get_instruction_light_count line, matrix
   change = 0
   instruction, root, peak = parse_line(line)
   case instruction
@@ -29,10 +59,20 @@ end
 
 def get_lit_lights_count file_path, matrix_size
   lines = get_file_lines(file_path)
-  matrix = create_matrix(matrix_size)
+  matrix = create_matrix(matrix_size, -1)
   count = 0
   for line in lines
-    count += get_instruction_light_count(matrix, line)
+    count += get_instruction_light_count(line, matrix)
+  end
+  count
+end
+
+def get_lights_brightness file_path, matrix_size
+  lines = get_file_lines(file_path)
+  matrix = create_matrix(matrix_size, 0)
+  count = 0
+  for line in lines
+    count += get_instruction_light_brightness(line, matrix)
   end
   count
 end
@@ -62,3 +102,5 @@ MATRIX_SIZE = 1000
 
 count = get_lit_lights_count(INPUT_FILE, MATRIX_SIZE)
 puts "Input Total Lit Lights: #{count}"
+brightness = get_lights_brightness(INPUT_FILE, MATRIX_SIZE)
+puts "Input Light Brightness: #{brightness}"
