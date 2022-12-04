@@ -11,14 +11,17 @@ def parse_line_pair line
   end
 end
 
-def get_contained_count lines
-  count = 0
+def get_contained_and_overlapped_count lines
+  contained = 0
+  overlapped = 0
   for line in lines
     a, b = parse_line_pair(line)
-    contained = is_contained_in(a, b) 
-    count += 1 if contained 
+    is_contained = is_contained_in(a, b) 
+    is_overlapped = is_overlapped_in(a, b)
+    contained += 1 if is_contained
+    overlapped += 1 if is_overlapped 
   end
-  count
+  return contained, overlapped
 end
 
 def is_contained_in a, b
@@ -27,12 +30,24 @@ def is_contained_in a, b
   is_a_in_b || is_b_in_a
 end
 
+def is_overlapped_in a, b
+  max(a[0], b[0]) <= min(a[1], b[1])
+end
+
+def max a, b
+  a > b ? a : b
+end
+
+def min a, b
+  a > b ? b : a
+end
+
 lines = get_file_lines(EXAMPLE_PATH)
-count = get_contained_count(lines)
+contained, overlapped = get_contained_and_overlapped_count(lines)
 puts "Example Results:"
-puts "-> Contained Count: #{count}"
+puts "-> Contained Count: #{contained} | Overlapped: #{overlapped}"
 
 lines = get_file_lines(INPUT_PATH)
-count = get_contained_count(lines)
+contained, overlapped = get_contained_and_overlapped_count(lines)
 puts "Input Results:"
-puts "-> Contained Count: #{count}"
+puts "-> Contained Count: #{contained} | Overlapped: #{overlapped}"
