@@ -8,12 +8,12 @@ const (
 
 fn main() {
 	mut lines := get_file_lines(example_file_path)!
-	mut count := get_overlapped_count(lines)
+	mut count := get_contained_count(lines)
 	println("Example Result:")
 	println("--> Contained Count: $count")
 	
 	lines = get_file_lines(input_file_path)!
-	count = get_overlapped_count(lines)
+	count = get_contained_count(lines)
 	println("Input Result:")
 	println("--> Contained Count: $count")
 }
@@ -25,7 +25,7 @@ fn get_file_lines(file_path string) ![]string {
 	return lines
 }
 
-fn get_overlapped_count(lines []string) int {
+fn get_contained_count(lines []string) int {
 	mut count := 0
 	for line in lines {
 		first, second := parse_line_pair(line)
