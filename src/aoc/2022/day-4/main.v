@@ -1,4 +1,3 @@
-import arrays { flat_map }
 import math { max, min }
 import os { read_lines }
 
