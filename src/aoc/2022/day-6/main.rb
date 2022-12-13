@@ -1,12 +1,12 @@
-def find_marker_position line
+def find_marker_position line, length
   package = []
   line.chars.each.with_index do |letter, index|
+    if package.length == length
+      return index, package
+    end
     if package.include?(letter)
       repeated_index = package.find_index(letter)
       package = package[repeated_index + 1..]
-    end
-    if package.length == 4
-      return index, package
     end
     package.append(letter)
   end
@@ -17,21 +17,28 @@ def get_file_lines file_path
   IO.readlines(file_path, chomp: true)
 end
 
-def print_results lines
+def print_results lines, length, type
+  puts "- #{type} Start Position:"
   lines.each.with_index do |line, index|
-		position, package = find_marker_position(line)
+		position, package = find_marker_position(line, length)
 		if position == -1
-			puts "Unable to find Start Position and Package from line #{index}"
+			puts "-- Unable to find Start Position and Package from line #{index}"
 		else
-			puts "Start Position: #{position} | Package: #{package}"
+			puts "-- Start Position: #{position} | Package: #{package}"
     end
   end
 end
 
 FILE_PATH_EXAMPLE = "./example.txt"
 FILE_PATH_INPUT = "./input.txt"
+POSITION_LEN_MARKER = 4
+POSITION_LEN_MESSAGE = 14
 
 lines = get_file_lines(FILE_PATH_EXAMPLE)
-print_results(lines)
+puts "Example File Results:"
+print_results(lines, POSITION_LEN_MARKER, "Marker")
+print_results(lines, POSITION_LEN_MESSAGE, "Message")
 lines = get_file_lines(FILE_PATH_INPUT)
-print_results(lines)
+puts "Input File Results:"
+print_results(lines, POSITION_LEN_MARKER, "Marker")
+print_results(lines, POSITION_LEN_MESSAGE, "Message")
