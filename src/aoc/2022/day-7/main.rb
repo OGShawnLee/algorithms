@@ -101,9 +101,32 @@ def find_directories_by_max_size directory, max_size
   directories
 end
 
+def find_smallest_deletable_directory directory
+  free_space = DISK_SIZE - directory.size 
+  needed_space = UPDATE_SIZE - free_space
+  smallest_dir = directory
+  directories = get_directories_with_size(directory)
+  for dir, size in directories
+    if size >= needed_space && size < smallest_dir.size
+      smallest_dir = dir
+    end
+  end
+  smallest_dir
+end
+
 def get_directories_by_max_size_sum directory, max_size
   directories = find_directories_by_max_size(directory, max_size)
   directories.reduce(:+)
+end
+
+def get_directories_with_size directory
+  directories = [[directory, directory.size]]
+  for dir in directory.directories.values
+    directories.concat(
+      get_directories_with_size(dir)
+    )
+  end
+  directories
 end
 
 def get_file_lines file_path
@@ -124,18 +147,26 @@ def parse_command line
   line[2..].split(" ")
 end
 
+def print_results file_name, count, smallest_dir
+  puts "#{file_name} File Results:"
+  puts "-- Directories Sum: #{count}"
+  puts "-- Smallest Deletable Directory: #{smallest_dir.name} | Size: #{smallest_dir.size}"
+end
+
+DISK_SIZE = 70_000_000
 FILE_PATH_EXAMPLE = "./example.txt"
 FILE_PATH_INPUT = "./input.txt"
 MAXIMUM_DIR_SIZE = 100_000
+UPDATE_SIZE = 30_000_000
 
 lines = get_file_lines(FILE_PATH_EXAMPLE)
 root_dir = create_root_directory(lines)
 count = get_directories_by_max_size_sum(root_dir, MAXIMUM_DIR_SIZE)
-puts "Example File Results:"
-puts "-- Directories Sum: #{count}"
+smallest_dir = find_smallest_deletable_directory(root_dir)
+print_results("Example", count, smallest_dir)
 
 lines = get_file_lines(FILE_PATH_INPUT)
 root_dir = create_root_directory(lines)
 count = get_directories_by_max_size_sum(root_dir, MAXIMUM_DIR_SIZE)
-puts "Input File Results:"
-puts "-- Directories Sum: #{count}"
+smallest_dir = find_smallest_deletable_directory(root_dir)
+print_results("Input", count, smallest_dir)
