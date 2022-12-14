@@ -112,6 +112,11 @@ def parse_file(line: str):
   is_directory = attributes[0] == "dir"
   return is_directory, attributes
 
+def print_results(file_name: str, count: int, directory: Directory):
+  print(f"{file_name} File Results:")
+  print(f"-- Directories Sum: {count}")
+  print(f"-- Smallest Deletable Directory: {directory.name} | Size: {directory.size}")
+  
 DISK_SIZE = 70_000_000
 FILE_PATH_EXAMPLE = "./example.txt"
 FILE_PATH_INPUT = "./input.txt"
@@ -122,17 +127,12 @@ if __name__ == "__main__":
   lines = get_file_lines(FILE_PATH_EXAMPLE)
   root_dir = create_root_directory(lines)
   count = get_directories_by_max_size_sum(root_dir, MAXIMUM_DIR_SIZE)
-  print("Example File Results:")
-  print(f"-- Directories Sum: {count}")
-  dir_with_size = get_directories_with_size(root_dir)
   smallest_dir = find_smallest_deletable_directory(root_dir)
-  print(f"-- Smallest Deletable Directory: {smallest_dir.name} | Size: {smallest_dir.size}")
+  print_results("Example", count, smallest_dir)
 
   lines = get_file_lines(FILE_PATH_INPUT)
   root_dir = create_root_directory(lines)
   count = get_directories_by_max_size_sum(root_dir, MAXIMUM_DIR_SIZE)
-  print("Input File Results:")
-  print(f"-- Directories Sum: {count}")
   smallest_dir = find_smallest_deletable_directory(root_dir)
-  print(f"-- Smallest Deletable Directory: {smallest_dir.name} | Size: {smallest_dir.size}")
+  print_results("Example", count, smallest_dir)
   
