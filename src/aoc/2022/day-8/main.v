@@ -69,37 +69,36 @@ fn is_visible_from(
 	tree_height int, 
 	direction string
 ) !bool {
-	mut is_visible := true
 	match direction {
 		"top" {
 			for r_index := row_index - 1; r_index >= 0; r_index-- {
 				top_tree := grid[r_index][column_index]
-				if top_tree >= tree_height { is_visible = false }
+				if top_tree >= tree_height { return false }
 			} 
 		}
 		"bot" {
 			for r_index in row_index + 1..grid.len {
 				bottom_tree := grid[r_index][column_index]
-				if bottom_tree >= tree_height { is_visible = false }
+				if bottom_tree >= tree_height { return false }
 			}
 		}
 		"right" {
 			for c_index in column_index + 1..grid.len {
 				right_tree := grid[row_index][c_index]
-				if right_tree >= tree_height { is_visible = false }
+				if right_tree >= tree_height { return false }
 			}
 		}
 		"left" {
 			for c_index := column_index - 1; c_index >= 0; c_index-- {
 				left_tree := grid[row_index][c_index]
-				if left_tree >= tree_height { is_visible = false }
+				if left_tree >= tree_height { return false }
 			}
 		}
 		else {
 			panic("invalid direction")
 		}
 	}
-	return is_visible
+	return true
 }
 
 fn is_visible(grid [][]int, r_index int, c_index int, tree_height int) !bool {
