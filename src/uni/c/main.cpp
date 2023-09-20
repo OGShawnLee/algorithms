@@ -21,8 +21,26 @@ void handle_variable_types() {
     report_value("Crime", crime);
 }
 
+void handle_math() {
+    int a = get_float("Enter a number: ");
+    int b = get_float("Enter another number: ");
+
+    int sum = a + b;
+    int difference = a - b;
+    int product = a * b;
+    int quotient = a / b;
+    int remainder = a % b;
+
+    report_value("Sum", sum);
+    report_value("Difference", difference);
+    report_value("Product", product);
+    report_value("Quotient", quotient);
+    report_value("Remainder", remainder);
+}
+
 int main() {
     handle_variable_types();
+    handle_math();
     return 0;
 }
 
