@@ -99,31 +99,40 @@ Game parse(string line) {
 
 int main() {
   int id_total = 0;
+  int game_power_total = 0;
 
   each_line("input.txt", [&](string line) {
     Game game = parse(line);
     bool is_possible = true;
+    int max_red = 0;
+    int max_green = 0;
+    int max_blue = 0;
 
     for (vector<Cube> set : game.sets) {
       for (Cube cube : set) {
         if (cube.name == "red") {
           if (cube.amount > 12) is_possible = false;
+          max_red = max(max_red, cube.amount);
         }
 
         if (cube.name == "green") {
           if (cube.amount > 13) is_possible = false;
+          max_green = max(max_green, cube.amount);
         }
 
         if (cube.name == "blue") {
           if (cube.amount > 14) is_possible = false;
+          max_blue = max(max_blue, cube.amount);
         }
       }
     }
 
     if (is_possible) id_total += game.id;
+    game_power_total += max_red * max_green * max_blue;
   });
 
   printf("ID Total: %d\n", id_total);
+  printf("Game Power Total: %d\n", game_power_total);
 
   return 0;
 }
