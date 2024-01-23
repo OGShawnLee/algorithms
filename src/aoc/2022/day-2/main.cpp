@@ -8,6 +8,9 @@ using namespace std;
 short ROCK_SCORE = 1;
 short PAPER_SCORE = 2;
 short SCISSORS_SCORE = 3;
+short LOSE_SCORE = 0;
+short DRAW_SCORE = 3;
+short WIN_SCORE = 6;
 
 // For Part-1
 map<char, string> MOVE_NAMES = {
@@ -66,22 +69,22 @@ class Round {
     string move_infered_name = MOVE_NAMES[move_infered];
 
     if (move_elf_name == move_infered_name) {
-      return 3 + move_score;
+      return DRAW_SCORE + move_score;
     }
 
     if (move_elf_name == "ROCK" && move_infered_name == "SCISSORS") {
-      return move_score;
+      return LOSE_SCORE + move_score;
     }
 
     if (move_elf_name == "PAPER" && move_infered_name == "ROCK") {
-      return move_score;
+      return LOSE_SCORE + move_score;
     }
 
     if (move_elf_name == "SCISSORS" && move_infered_name == "PAPER") {
-      return move_score;
+      return LOSE_SCORE + move_score;
     }
 
-    return 6 + move_score;
+    return WIN_SCORE + move_score;
   }
 
   // For Part-2
@@ -90,29 +93,29 @@ class Round {
     string outcome_name = OUTCOME[outcome];
 
     if (outcome_name == "DRAW") {
-      return 3 + MOVE_SCORES[move_elf];
+      return DRAW_SCORE + MOVE_SCORES[move_elf];
     }
 
     if (outcome_name == "WIN") {
       if (move_elf_name == "ROCK") {
-        return 6 + PAPER_SCORE;
+        return WIN_SCORE + PAPER_SCORE;
       }
 
       if (move_elf_name == "PAPER") {
-        return 6 + SCISSORS_SCORE;
+        return WIN_SCORE + SCISSORS_SCORE;
       }
     
-      return 6 + ROCK_SCORE;
+      return WIN_SCORE + ROCK_SCORE;
     }
 
     // LOSE
     if (move_elf_name == "PAPER") {
-      return ROCK_SCORE;
+      return LOSE_SCORE + ROCK_SCORE;
     } else if (move_elf_name == "ROCK") {
-      return SCISSORS_SCORE;
+      return LOSE_SCORE + SCISSORS_SCORE;
     }
 
-    return PAPER_SCORE;
+    return LOSE_SCORE + PAPER_SCORE;
   }
 };
 
