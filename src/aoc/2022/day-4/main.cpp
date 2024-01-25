@@ -64,19 +64,29 @@ void each_pair(string file_path, function<void(Pair &)> on_pair) {
   });
 }
 
+
 bool is_contained(const Pair &pair) {
   bool first_in_second = pair.elf_1.min >= pair.elf_2.min && pair.elf_1.max <= pair.elf_2.max;
   bool second_in_first = pair.elf_2.min >= pair.elf_1.min && pair.elf_2.max <= pair.elf_1.max;
   return first_in_second || second_in_first;
 }
 
+bool is_overlapped(const Pair &pair) {
+  return max(pair.elf_1.min, pair.elf_2.min) <= min(pair.elf_1.max, pair.elf_2.max);
+}
+
 int main() {
   short contained_count = 0;
+  short overlapped_count = 0;
   each_pair("input.txt", [&](Pair &pair) {
     if (is_contained(pair)) {
       contained_count++;
+      overlapped_count++;
+    } else if (is_overlapped(pair)) {
+      overlapped_count++;
     }
   });
   printf("Contained Count: %d\n", contained_count);
+  printf("Overlapped Count: %d\n", overlapped_count);
   return 0;
 }
